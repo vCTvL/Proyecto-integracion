@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área Pública</title>
+    <link rel="stylesheet" href="style-public.css">
+</head>
+<body>
+    <main>
+        <!-- Contenedor de componentes (izquierda) -->
+        <div class="component-container">
+            <h1>Bienvenido al área pública</h1>
+            <p>Hola usuario normal!</p>
+            
+            <div class="component-group">
+                <p>Procesador:</p>
+                <select id="procesador-combo"></select>
+                <button class="detalle-btn" data-tipo="procesador" data-combo="procesador-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="procesador" data-combo="procesador-combo">Agregar Producto</button>
+            </div>
+            
+            <div class="component-group">
+                <p>GPU:</p>
+                <select id="gpu-combo"></select>
+                <button class="detalle-btn" data-tipo="gpu" data-combo="gpu-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="gpu" data-combo="gpu-combo">Agregar Producto</button>
+            </div>
+            
+            <div class="component-group">
+                <p>RAM:</p>
+                <select id="ram-combo"></select>
+                <button class="detalle-btn" data-tipo="ram" data-combo="ram-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="ram" data-combo="ram-combo">Agregar Producto</button>
+            </div>
+            
+            <div class="component-group">
+                <p>Placa Madre:</p>
+                <select id="mobo-combo"></select>
+                <button class="detalle-btn" data-tipo="mobo" data-combo="mobo-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="mobo" data-combo="mobo-combo">Agregar Producto</button>
+            </div>
+            
+            <div class="component-group">
+                <p>Disco Duro:</p>
+                <select id="hdd-combo"></select>
+                <button class="detalle-btn" data-tipo="hdd" data-combo="hdd-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="hdd" data-combo="hdd-combo">Agregar Producto</button>
+            </div>
+            
+            <div class="component-group">
+                <p>SSD:</p>
+                <select id="ssd-combo"></select>
+                <button class="detalle-btn" data-tipo="ssd" data-combo="ssd-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="ssd" data-combo="ssd-combo">Agregar Producto</button>
+            </div>
+            
+            <div class="component-group">
+                <p>Fuente:</p>
+                <select id="fuente-combo"></select>
+                <button class="detalle-btn" data-tipo="fuente" data-combo="fuente-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="fuente" data-combo="fuente-combo">Agregar Producto</button>
+            </div>
+            
+            <div class="component-group">
+                <p>Gabinete:</p>
+                <select id="gabinete-combo"></select>
+                <button class="detalle-btn" data-tipo="gabinete" data-combo="gabinete-combo">Ver detalles</button>
+                <button class="agregar-btn" data-tipo="gabinete" data-combo="gabinete-combo">Agregar Producto</button>
+            </div>
+        </div>
+        
+        <!-- Contenedor de detalles (derecha) -->
+        <div class="details-container">
+            <div id="detalles-procesador" style="display: none;">
+                <h3>Detalles del Producto:</h3>
+                <div id="detalles-contenido"></div>
+            </div>
+            <button id="btn-mi-pc" class="agregar-btn" style="margin-top:20px;">Registrar mi PC</button>
+            <div id="mi-pc-resumen" style="margin-top:24px;display:none;">
+                <h3>Mi Computador</h3>
+                <div id="mi-pc-detalles"></div>
+                <h4>Recomendaciones de mejora</h4>
+                <div id="mi-pc-recomendaciones"></div>
+            </div>
+        </div>
+        
+        <button id="logout-btn">Cerrar sesión</button>
+    </main>
+
+    <script src="public.js"></script>
+</body>
+</html>

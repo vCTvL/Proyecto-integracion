@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área de Administración</title>
+    <link rel="stylesheet" href="../style-public.css">
+</head>
+<body>
+    <main>
+        <div class="component-container">
+            <h1>Bienvenido al área de administración</h1>
+            <p>Panel de control administrativo</p>
+
+            <!-- Navegación de CRUD por tabla -->
+            <div style="margin-bottom:20px;">
+                <button class="detalle-btn" type="button" id="btn-agregar-producto">Agregar producto</button>
+                <button class="detalle-btn" type="button" id="btn-editar-producto">Editar producto</button>
+                <button class="detalle-btn" type="button" id="btn-eliminar-producto">Eliminar producto</button>
+            </div>   
+
+            <!-- Modal para agregar producto -->
+            <div id="modal-agregar-producto" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000; align-items:center; justify-content:center;">
+                <div style="background:white; padding:24px 20px 20px 20px; border-radius:8px; min-width:320px; max-width:90vw; position:relative;">
+                    <button id="cerrar-modal-agregar" style="position:absolute;top:8px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;">&times;</button>
+                    <h3 style="margin-top:0;">¿Qué productos deseas agregar?</h3>
+                    <select id="tipo-producto-select" style="width:100%;margin-bottom:16px;">
+                        <option value="">Selecciona tipo...</option>
+                        <option value="procesadores">Procesador</option>
+                        <option value="mobo">Placa Madre</option>
+                        <option value="rams">RAM</option>
+                        <option value="gabinetes">Gabinete</option>
+                        <option value="fuentes">Fuente de poder</option>
+                        <option value="gpus">GPU</option>
+                        <option value="ssd">SSD</option>
+                        <option value="hdd">HDD</option>
+                    </select>
+                    <!-- Formularios dinámicos por tipo -->
+                    <form id="form-agregar-producto" style="display:none;flex-direction:column;gap:10px;">
+                        <!-- Aquí se insertan los inputs dinámicamente -->
+                    </form>
+                    <div id="msg-agregar-producto" style="color:#16a34a;margin-top:8px;"></div>
+                </div>
+            </div>
+
+            <!-- Modal para editar producto -->
+            <div id="modal-editar-producto" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000; align-items:center; justify-content:center;">
+                <div style="background:white; padding:24px 20px 20px 20px; border-radius:8px; min-width:320px; max-width:90vw; position:relative;">
+                    <button id="cerrar-modal-editar" style="position:absolute;top:8px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;">&times;</button>
+                    <h3 style="margin-top:0;">¿Qué producto deseas editar?</h3>
+                    <select id="tipo-editar-select" style="width:100%;margin-bottom:16px;">
+                        <option value="">Selecciona tipo...</option>
+                        <option value="procesadores">Procesador</option>
+                        <option value="mobo">Placa Madre</option>
+                        <option value="rams">RAM</option>
+                        <option value="gabinetes">Gabinete</option>
+                        <option value="fuentes">Fuente de poder</option>
+                        <option value="gpus">GPU</option>
+                        <option value="ssd">SSD</option>
+                        <option value="hdd">HDD</option>
+                    </select>
+                    <select id="producto-editar-select" style="width:100%;margin-bottom:16px;display:none;">
+                        <option value="">Selecciona producto...</option>
+                    </select>
+                    <form id="form-editar-producto" style="display:none;flex-direction:column;gap:10px;">
+                        <!-- Inputs dinámicos aquí -->
+                    </form>
+                    <button id="editar-producto-btn" class="agregar-btn" style="display:none;background:#f59e42;">Guardar Cambios</button>
+                    <div id="msg-editar-producto" style="color:#16a34a;margin-top:8px;"></div>
+                </div>
+            </div>
+
+            <!-- Modal para eliminar producto -->
+            <div id="modal-eliminar-producto" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000; align-items:center; justify-content:center;">
+                <div style="background:white; padding:24px 20px 20px 20px; border-radius:8px; min-width:320px; max-width:90vw; position:relative;">
+                    <button id="cerrar-modal-eliminar" style="position:absolute;top:8px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;">&times;</button>
+                    <h3 style="margin-top:0;">¿Qué producto deseas eliminar?</h3>
+                    <select id="tipo-eliminar-select" style="width:100%;margin-bottom:16px;">
+                        <option value="">Selecciona tipo...</option>
+                        <option value="procesadores">Procesador</option>
+                        <option value="mobo">Placa Madre</option>
+                        <option value="rams">RAM</option>
+                        <option value="gabinetes">Gabinete</option>
+                        <option value="fuentes">Fuente de poder</option>
+                        <option value="gpus">GPU</option>
+                        <option value="ssd">SSD</option>
+                        <option value="hdd">HDD</option>
+                    </select>
+                    <select id="producto-eliminar-select" style="width:100%;margin-bottom:16px;display:none;">
+                        <option value="">Selecciona producto...</option>
+                    </select>
+                    <button id="eliminar-producto-btn" class="agregar-btn" style="display:none;background:#ef4444;">Eliminar</button>
+                    <div id="msg-eliminar-producto" style="color:#16a34a;margin-top:8px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor de listado/detalles (derecha) -->
+        <div class="details-container">
+            <div id="admin-detalles">
+                <h3>Listado de Productos</h3>
+                <button id="mostrar-bd-btn" class="agregar-btn" style="margin-bottom:16px;">Mostrar Base de Datos</button>
+                <div id="admin-listado">
+                    <!-- Aquí se mostrará el listado CRUD dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <button id="logout-btn">Cerrar sesión</button>
+    </main>
+    <script src="../admin.js"></script>
+</body>
+</html>
