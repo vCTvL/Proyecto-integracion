@@ -123,7 +123,7 @@ app.post('/api/admin/:tabla', async (req, res) => {
     // Define los campos permitidos por tabla
     const camposPorTabla = {
         procesadores: ['nombre', 'marca', 'nucleos', 'frecuencia_base', 'socket'],
-        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento'],
+        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'socket'], 
         rams: ['nombre', 'marca', 'frecuencia', 'anio_lanzamiento'],
         gabinetes: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento'],
         fuentes: ['nombre', 'marca', 'watts', 'modular', 'anio_lanzamiento'],
@@ -170,7 +170,7 @@ app.put('/api/admin/:tabla/:id', async (req, res) => {
     const datos = req.body;
     const camposPorTabla = {
         procesadores: ['nombre', 'marca', 'nucleos', 'frecuencia_base', 'socket'],
-        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento'],
+        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'socket'],
         rams: ['nombre', 'marca', 'frecuencia', 'anio_lanzamiento'],
         gabinetes: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento'],
         fuentes: ['nombre', 'marca', 'watts', 'modular', 'anio_lanzamiento'],

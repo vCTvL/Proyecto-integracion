@@ -172,10 +172,7 @@ document.getElementById('btn-mi-pc').addEventListener('click', async () => {
             recomendaciones.push('Tu fuente podría ser insuficiente para tu GPU. Considera una fuente de al menos 650W.');
         }
     }
-    // 5. Procesador antiguo
-    if (detalles.procesador && detalles.procesador.nombre && detalles.procesador.nombre.match(/i[357]-[0-7]\d{3}/i)) {
-        recomendaciones.push('Tu procesador es de una generación antigua. Considera actualizarlo para mejor compatibilidad.');
-    }
+   
 
     // 6. Validación de socket entre procesador y placa madre
     if (
@@ -248,6 +245,113 @@ document.getElementById('btn-mi-pc').addEventListener('click', async () => {
         recomendaciones.push('¡Tu configuración es equilibrada! No se detectan mejoras urgentes.');
     }
 
+    // Mostrar recomendaciones
     document.getElementById('mi-pc-recomendaciones').innerHTML = recomendaciones.map(r => `<li>${r}</li>`).join('');
+
+    // Mostrar sugerencias de componentes compatibles si hay recomendaciones
+    const sugerenciasDivId = 'mi-pc-sugerencias';
+    let sugerenciasDiv = document.getElementById(sugerenciasDivId);
+    if (!sugerenciasDiv) {
+        sugerenciasDiv = document.createElement('div');
+        sugerenciasDiv.id = sugerenciasDivId;
+        document.getElementById('mi-pc-resumen').appendChild(sugerenciasDiv);
+    }
+    sugerenciasDiv.innerHTML = '';
+
+    // --- NUEVO: Sugerencias robustas por tipo de recomendación ---
+    if (recomendaciones.length > 0 && recomendaciones[0].indexOf('¡Tu configuración es equilibrada!') === -1) {
+        // Determinar el tipo de componente a sugerir según la recomendación
+        let sugerencias = [];
+        let tipoSugerido = null;
+
+        // Busca el tipo de recomendación principal (puedes mejorar el análisis si tienes varias recomendaciones)
+        const rec = recomendaciones[0].toLowerCase();
+
+        if (rec.includes('gpu')) tipoSugerido = 'gpu';
+        else if (rec.includes('procesador')) tipoSugerido = 'procesador';
+        else if (rec.includes('ram')) tipoSugerido = 'ram';
+        else if (rec.includes('gabinete')) tipoSugerido = 'gabinete';
+        else if (rec.includes('placa madre') || rec.includes('mobo')) tipoSugerido = 'mobo';
+        else if (rec.includes('fuente')) tipoSugerido = 'fuente';
+        else if (rec.includes('ssd')) tipoSugerido = 'ssd';
+        else if (rec.includes('disco duro') || rec.includes('hdd')) tipoSugerido = 'hdd';
+
+        // Si no se detecta tipo, no sugerir nada
+        if (tipoSugerido) {
+            try {
+                const res = await fetch(`/api/admin/${tipoSugerido === 'procesador' ? 'procesadores' : tipoSugerido === 'ram' ? 'rams' : tipoSugerido === 'gabinete' ? 'gabinetes' : tipoSugerido}`);
+                if (res.ok) {
+                    const lista = await res.json();
+                    let compatibles = [];
+                    // Filtros por tipo
+                    if (tipoSugerido === 'gpu' && detalles.gpu) {
+                        compatibles = lista.filter(g => g.memoria > (detalles.gpu.memoria || 0));
+                    } else if (tipoSugerido === 'procesador' && detalles.mobo && detalles.mobo.socket) {
+                        compatibles = lista.filter(p => p.socket === detalles.mobo.socket && p.id !== detalles.procesador?.id);
+                    } else if (tipoSugerido === 'ram' && detalles.ram) {
+                        compatibles = lista.filter(r => r.frecuencia > (detalles.ram.frecuencia || 0));
+                    } else if (tipoSugerido === 'gabinete' && detalles.gabinete) {
+                        // Sugerir gabinetes más grandes si la GPU es grande
+                        if (detalles.gpu && detalles.gpu.memoria >= 12) {
+                            compatibles = lista.filter(g => !g.tamanio.toLowerCase().includes('mini'));
+                        } else {
+                            compatibles = lista.filter(g => g.id !== detalles.gabinete?.id);
+                        }
+                    } else if (tipoSugerido === 'mobo' && detalles.procesador && detalles.procesador.socket) {
+                        compatibles = lista.filter(m => m.socket === detalles.procesador.socket && m.id !== detalles.mobo?.id);
+                    } else if (tipoSugerido === 'fuente' && detalles.gpu && detalles.gpu.memoria) {
+                        compatibles = lista.filter(f => f.watts >= 650 && f.id !== detalles.fuente?.id);
+                    } else if (tipoSugerido === 'ssd' && detalles.ssd) {
+                        compatibles = lista.filter(s => s.capacidad > (detalles.ssd.capacidad || 0));
+                    } else if (tipoSugerido === 'hdd' && detalles.hdd) {
+                        compatibles = lista.filter(h => h.capacidad > (detalles.hdd.capacidad || 0));
+                    }
+                    // Si no hay compatibles, muestra todos menos el actual
+                    if (compatibles.length === 0) {
+                        compatibles = lista.filter(x => x.id !== detalles[tipoSugerido]?.id);
+                    }
+                    sugerencias = compatibles.slice(0, 3).map(item => ({
+                        tipo: tipoSugerido,
+                        item
+                    }));
+                }
+            } catch {}
+        }
+
+        // Mostrar sugerencias
+        let html = '';
+        if (sugerencias.length > 0) {
+            html += `<div style="margin-top:18px;"><strong>Componentes sugeridos compatibles:</strong><div style="display:flex;gap:18px;margin-top:8px;flex-wrap:wrap;">`;
+            sugerencias.forEach(sug => {
+                html += `<div class="sugerencia-componente" data-tipo="${sug.tipo}" data-id="${sug.item.id}" style="cursor:pointer;padding:12px 18px;background:#f1f5f9;border-radius:8px;box-shadow:0 2px 8px rgba(30,58,138,0.07);min-width:120px;text-align:center;">
+                    <div style="font-weight:600;">${sug.item.nombre}</div>
+                    <div style="font-size:13px;color:#64748b;">${sug.tipo.toUpperCase()}</div>
+                </div>`;
+            });
+            html += `</div></div>`;
+        }
+        sugerenciasDiv.innerHTML = html;
+
+        // Evento click para sugerencias
+        sugerenciasDiv.querySelectorAll('.sugerencia-componente').forEach(div => {
+            div.addEventListener('click', async function() {
+                const tipo = div.getAttribute('data-tipo');
+                const id = div.getAttribute('data-id');
+                // Selecciona el combo correspondiente y setea el valor
+                const comp = componentes.find(c => c.tipo === tipo);
+                if (comp) {
+                    const combo = document.getElementById(comp.combo);
+                    if (combo) {
+                        combo.value = id;
+                        // Dispara el evento de ver detalles
+                        document.querySelector(`.detalle-btn[data-tipo="${tipo}"]`).click();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    } else {
+        sugerenciasDiv.innerHTML = '';
+    }
 });
 

@@ -14,16 +14,27 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    padding-bottom: 60px; /* Para que el contenido no quede tapado por el footer fijo */
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    display: flex;
+    height: auto;
+    padding-bottom: 0;
 }
 
 /* Contenedor principal */
 .main-container {
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     padding: 40px 30px;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    width: 100%;
+    width: 50%;
     max-width: 400px;
+    flex: 1 1 0;
+    margin: 210px ;
+    
 }
 
 /* Título */
@@ -106,3 +117,47 @@ input:focus {
 .link:hover {
     color: #1d4ed8;
 }
+
+/* Navbar fijo arriba */
+.navbar-mipc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 56px;
+    background-color: #1e3a8a;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Título a la izquierda, botón a la derecha */
+    padding: 0 32px 0 24px;
+    font-weight: 700;
+    font-size: 20px;
+    z-index: 300;
+    box-sizing: border-box;
+}
+
+.navbar-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-right: 32px;
+}
+
+/* Footer al fondo, solo visible al final, nunca tapa contenido */
+.footer-mipc {
+    width: 100%;
+    background: #1e3a8a;
+    color: white;
+    text-align: center;
+    padding: 18px 0 14px 0;
+    font-size: 15px;
+    font-weight: 400;
+    position: relative;
+    left: 0;
+    bottom: 0;
+    z-index: 200;
+    margin-top: 40px;
+}
+
+/* Para asegurar que el footer quede al fondo si hay poco contenido */
