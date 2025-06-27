@@ -72,52 +72,60 @@ const camposPorTipo = {
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'nucleos', label: 'Núcleos', type: 'number', required: true },
         { name: 'frecuencia_base', label: 'Frecuencia Base (GHz)', type: 'number', step: '0.1', required: true },
-        { name: 'socket', label: 'Socket', type: 'text', required: true }
+        { name: 'socket', label: 'Socket', type: 'text', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
     mobo: [
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'tamanio', label: 'Tamaño', type: 'text', required: true },
         { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true },
-        { name: 'socket', label: 'Socket', type: 'text', required: true }
+        { name: 'socket', label: 'Socket', type: 'text', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
     rams: [
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'capacidad', label: 'Capacidad (GB)', type: 'number', required: true },
         { name: 'frecuencia', label: 'Frecuencia (MHz)', type: 'number', required: true },
-        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true }
+        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
     gabinetes: [
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'tamanio', label: 'Tamaño', type: 'text', required: true },
-        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true }
+        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
     fuentes: [
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'watts', label: 'Watts', type: 'number', required: true },
         { name: 'modular', label: 'Modular (Sí/No/Semi)', type: 'text', required: true },
-        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true }
+        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
     gpus: [
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'memoria', label: 'Memoria (GB)', type: 'number', required: true },
-        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true }
+        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
     ssd: [
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'capacidad', label: 'Capacidad (GB)', type: 'number', required: true },
-        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true }
+        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
     hdd: [
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'capacidad', label: 'Capacidad (TB)', type: 'number', required: true },
-        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true }
+        { name: 'anio_lanzamiento', label: 'Año Lanzamiento', type: 'number', required: true },
+        { name: 'precio', label: 'Precio', type: 'number', required: true }
     ]
 };
 
@@ -162,12 +170,17 @@ formAgregar.addEventListener('submit', async (e) => {
         if (el.name) {
             // Convierte a número si es type number
             if (el.type === 'number') {
-                datos[el.name] = el.value !== '' ? Number(el.value) : '';
+                if (el.value === '' || el.value === null || typeof el.value === 'undefined') {
+                    camposVacios.push(el.name);
+                } else {
+                    datos[el.name] = Number(el.value);
+                }
             } else {
-                datos[el.name] = el.value;
-            }
-            if (el.value === '' || el.value === null || typeof el.value === 'undefined') {
-                camposVacios.push(el.name);
+                if (el.value === '' || el.value === null || typeof el.value === 'undefined') {
+                    camposVacios.push(el.name);
+                } else {
+                    datos[el.name] = el.value;
+                }
             }
         }
     });

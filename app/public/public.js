@@ -48,10 +48,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     const contenedorDetalles = document.getElementById('detalles-procesador');
     const contenidoDetalles = document.getElementById('detalles-contenido');
 
+    // Botón comprar (se crea una sola vez)
+    let btnComprar = document.createElement('button');
+    btnComprar.textContent = 'Comprar';
+    btnComprar.className = 'detalle-btn';
+    btnComprar.style.marginTop = '16px';
+    btnComprar.style.display = 'none';
+    btnComprar.disabled = true; // Inicialmente deshabilitado
+    // Insertar el botón al final del contenedor de detalles
+    contenedorDetalles.appendChild(btnComprar);
+
+    // --- NUEVO: Control de habilitación del botón comprar ---
+    // IDs de los combos requeridos
+    const comboIds = [
+        'procesador-combo',
+        'ram-combo',
+        'gpu-combo',
+        'mobo-combo',
+        'hdd-combo',
+        'ssd-combo',
+        'fuente-combo',
+        'gabinete-combo'
+    ];
+
+    // Función para verificar si todos los combos tienen selección válida
+    function actualizarEstadoBotonComprar() {
+        const todosSeleccionados = comboIds.every(id => {
+            const el = document.getElementById(id);
+            return el && el.value && el.value !== '';
+        });
+        btnComprar.disabled = !todosSeleccionados;
+    }
+
+    // Asignar evento change a todos los combos
+    comboIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('change', actualizarEstadoBotonComprar);
+        }
+    });
+
+    // Llamar al menos una vez al cargar
+    actualizarEstadoBotonComprar();
+
     // Función genérica para mostrar detalles
-    async function mostrarDetalles(tipo, comboId) {
+    async function mostrarDetalles(tipo, comboId, idForzar = null) {
         const combo = document.getElementById(comboId);
-        const id = combo.value;
+        const id = idForzar || combo.value;
         if (!id) {
             alert(`Por favor seleccione un ${tipo}`);
             return;
@@ -68,10 +111,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             contenidoDetalles.innerHTML = html;
             contenedorDetalles.style.display = 'block';
+
+            // Mostrar el botón comprar y guardar info del producto
+            btnComprar.style.display = 'block';
+            btnComprar.dataset.tipo = tipo;
+            btnComprar.dataset.id = id;
+            btnComprar.dataset.nombre = data.nombre || '';
+            btnComprar.dataset.precio = data.precio || '0';
+            actualizarEstadoBotonComprar(); // Actualiza el estado al mostrar detalles
         } catch (error) {
             console.error('Error:', error);
             contenidoDetalles.innerHTML = `<p class="error">Error al cargar los detalles de ${tipo}</p>`;
             contenedorDetalles.style.display = 'block';
+            btnComprar.style.display = 'none';
         }
     }
 
@@ -82,6 +134,54 @@ document.addEventListener('DOMContentLoaded', async () => {
             const comboId = btn.getAttribute('data-combo');
             mostrarDetalles(tipo, comboId);
         });
+    });
+
+    // Evento para botón comprar
+    btnComprar.addEventListener('click', async function () {
+        const tipo = btnComprar.dataset.tipo;
+        const idProducto = btnComprar.dataset.id;
+        const precio = btnComprar.dataset.precio;
+        if (!tipo || !idProducto || !precio) return;
+        if (!confirm('¿Seguro que deseas comprar el producto?')) return;
+        // Lógica para registrar la compra
+        console.log(`Comprando ${tipo} con ID: ${idProducto} y precio: ${precio}`);
+
+        // Obtener todos los ids de los combos seleccionados
+        const idsComponentes = {
+            idGabinete: getSelectedValue('gabinete-combo'),
+            idGPU: getSelectedValue('gpu-combo'),
+            idProcesador: getSelectedValue('procesador-combo'),
+            idMobo: getSelectedValue('mobo-combo'),
+            idHdd: getSelectedValue('hdd-combo'),
+            idSsd: getSelectedValue('ssd-combo'),
+            idRam: getSelectedValue('ram-combo'),
+            idFuente: getSelectedValue('fuente-combo')
+        };
+
+        try {
+            // Registrar la compra
+            const body = {
+                idProducto: idProducto,
+                cantidad: 1,
+                precio: precio,
+                componentes: idsComponentes // enviar los ids de componentes
+            };
+            const res = await fetch('/api/public/comprar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) throw new Error();
+            // Mensaje de éxito
+            const msg = document.createElement('div');
+            msg.textContent = '¡Producto comprado exitosamente!';
+            msg.style.color = '#16a34a';
+            msg.style.marginTop = '10px';
+            contenidoDetalles.appendChild(msg);
+            setTimeout(() => { msg.remove(); }, 2000);
+        } catch {
+            alert('Error al registrar la compra');
+        }
     });
 });
 

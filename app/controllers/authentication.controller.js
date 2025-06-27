@@ -39,7 +39,7 @@ async function login(req, res) {
         res.cookie("jwt", token, cookieOption);
         
         // Redirigir según el tipo de usuario
-        if (user === "Vicente") { // Reemplaza "admin" con tu usuario administrador real
+        if (user === "admin") { 
             res.send({ status: "ok", message: "Administrador loggeado", redirect: "/admin" });
         } else {
             res.send({ status: "ok", message: "Usuario loggeado", redirect: "/public" });

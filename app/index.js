@@ -2,19 +2,20 @@ import express from 'express'
 import dotenv from 'dotenv';
 import path from "path"
 import { fileURLToPath } from 'url';
-import {methods as authentication} from "./controllers/authentication.controller.js"
+import { methods as authentication } from "./controllers/authentication.controller.js"
 import bcrypt from 'bcryptjs';
-import {methods as authorization} from "./middlewares/authorization.js"
+import { methods as authorization } from "./middlewares/authorization.js"
 import cookieParser from 'cookie-parser'
-import {methods as metodo} from "./controllers/carga_productos.js"
-import {methods as detalleComponente} from "./controllers/detalle-componentes.js";
+import { methods as metodo } from "./controllers/carga_productos.js"
+import { methods as detalleComponente } from "./controllers/detalle-componentes.js";
 import pool from './db.js';
-const __dirname= path.dirname(fileURLToPath(import.meta.url))
+import jwt from 'jsonwebtoken';
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 
 dotenv.config();
-const app= express()
-app.set("port",4000);
+const app = express()
+app.set("port", 4000);
 app.listen(app.get("port"));
 console.log("servidor corriendo en puerto", app.get("port"))
 app.use(express.json());
@@ -24,25 +25,26 @@ app.use(cookieParser())
 app.use(express.static(__dirname + "/public"));
 
 
+
 //RUTAS
 
 
 
-app.get("/", authorization.middleware, (req,res)=>{
-    res.sendFile(__dirname+"/pages/login.html")
+app.get("/", authorization.middleware, (req, res) => {
+    res.sendFile(__dirname + "/pages/login.html")
 })
 
-app.get("/register",authorization.middleware, (req,res)=>{
-    res.sendFile(__dirname+"/pages/register.html")
+app.get("/register", authorization.middleware, (req, res) => {
+    res.sendFile(__dirname + "/pages/register.html")
 })
 
-app.get("/admin", authorization.middleware,(req,res)=>{
-    res.sendFile(__dirname+"/pages/admin/admin.html")
+app.get("/admin", authorization.middleware, (req, res) => {
+    res.sendFile(__dirname + "/pages/admin/admin.html")
 })
 
-app.get('/public', authorization.middleware, async (req,res)=> {
-    res.sendFile(path.join(__dirname+"/pages/public.html"));
-    
+app.get('/public', authorization.middleware, async (req, res) => {
+    res.sendFile(path.join(__dirname + "/pages/public.html"));
+
 });
 
 app.post("/api/register", authentication.register)
@@ -122,14 +124,14 @@ app.post('/api/admin/:tabla', async (req, res) => {
 
     // Define los campos permitidos por tabla
     const camposPorTabla = {
-        procesadores: ['nombre', 'marca', 'nucleos', 'frecuencia_base', 'socket'],
-        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'socket'], 
-        rams: ['nombre', 'marca', 'frecuencia', 'anio_lanzamiento'],
-        gabinetes: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento'],
-        fuentes: ['nombre', 'marca', 'watts', 'modular', 'anio_lanzamiento'],
-        gpus: ['nombre', 'marca', 'memoria', 'anio_lanzamiento'],
-        ssd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento'],
-        hdd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento']
+        procesadores: ['nombre', 'marca', 'nucleos', 'frecuencia_base', 'socket', 'precio'],
+        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'socket', 'precio'],
+        rams: ['nombre', 'marca', 'frecuencia', 'anio_lanzamiento', 'precio'],
+        gabinetes: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'precio'],
+        fuentes: ['nombre', 'marca', 'watts', 'modular', 'anio_lanzamiento', 'precio'],
+        gpus: ['nombre', 'marca', 'memoria', 'anio_lanzamiento', 'precio'],
+        ssd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento', 'precio'],
+        hdd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento', 'precio']
     };
 
     if (!camposPorTabla[tabla]) {
@@ -169,14 +171,14 @@ app.put('/api/admin/:tabla/:id', async (req, res) => {
     const id = req.params.id;
     const datos = req.body;
     const camposPorTabla = {
-        procesadores: ['nombre', 'marca', 'nucleos', 'frecuencia_base', 'socket'],
-        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'socket'],
-        rams: ['nombre', 'marca', 'frecuencia', 'anio_lanzamiento'],
-        gabinetes: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento'],
-        fuentes: ['nombre', 'marca', 'watts', 'modular', 'anio_lanzamiento'],
-        gpus: ['nombre', 'marca', 'memoria', 'anio_lanzamiento'],
-        ssd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento'],
-        hdd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento']
+        procesadores: ['nombre', 'marca', 'nucleos', 'frecuencia_base', 'socket', 'precio'],
+        mobo: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'socket', 'precio'],
+        rams: ['nombre', 'marca', 'frecuencia', 'anio_lanzamiento', 'precio'],
+        gabinetes: ['nombre', 'marca', 'tamanio', 'anio_lanzamiento', 'precio'],
+        fuentes: ['nombre', 'marca', 'watts', 'modular', 'anio_lanzamiento', 'precio'],
+        gpus: ['nombre', 'marca', 'memoria', 'anio_lanzamiento', 'precio'],
+        ssd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento', 'precio'],
+        hdd: ['nombre', 'marca', 'capacidad', 'anio_lanzamiento', 'precio']
     };
     if (!camposPorTabla[tabla]) {
         return res.status(400).json({ error: 'Tabla no permitida' });
@@ -196,6 +198,81 @@ app.put('/api/admin/:tabla/:id', async (req, res) => {
         res.json({ status: 'ok', message: 'Producto editado' });
     } catch (err) {
         res.status(500).json({ error: 'Error al editar producto' });
+    }
+});
+
+// Endpoint para registrar compra desde el área pública
+app.post('/api/public/comprar', async (req, res) => {
+    try {
+        const { idProducto, cantidad, precio, componentes} = req.body;
+        console.log("Datos de compra recibidos:", req.body);
+        let idUsuario = null; // Debes declarar idUsuario aquí
+
+        // Obtener idUsuario desde JWT
+        try {
+            const token = req.cookies.jwt;
+            if (token) {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                const [rows] = await pool.query('SELECT id FROM usuarios WHERE user = ?', [decoded.user]);
+                if (rows.length > 0) idUsuario = rows[0].id;
+            }
+        } catch (e) {
+            // Si no hay usuario, idUsuario queda null
+        }
+        console.log("ID del usuario autenticado:", idUsuario);
+        if (!idProducto || !cantidad || !precio) {
+            return res.status(400).json({ error: 'Faltan datos para la compra' });
+        }
+
+        // 1. Insertar en detalleventa (sin idVenta aún)
+        const [result] = await pool.query(
+            'INSERT INTO detalleventa (idProducto, cantidad, total) VALUES (?, ?, ?)',
+            [idProducto, cantidad, precio * cantidad]
+        );
+        let detalleventaid = result.insertId; // Obtener el ID del detalleventa recién insertado
+
+        // 2. INSERTAR EN VENTAMAESTRA
+        const [ventaResult] = await pool.query(
+            'INSERT INTO ventamaestra (idUsuario, idDetalle) VALUES (?, ?)',
+            [idUsuario, detalleventaid]
+        );
+        const idVenta = ventaResult.insertId;
+
+        // 3. update de idventa en detalleventa
+        await pool.query(
+            'UPDATE detalleventa SET idVenta = ? ',
+            [idVenta]
+        );
+        // 4. insertar los ids de los componentes en la tabla componentes
+        if (componentes) {
+            const {
+                idGabinete = null,
+                idGPU = null,
+                idProcesador = null,
+                idMobo = null,
+                idHdd = null,
+                idSsd = null,
+                idRam = null,
+                idFuente = null
+            } = componentes;
+            await pool.query(
+                `INSERT INTO componentes (
+                    idGabinete,
+                    idGPU,
+                    idProcesador,
+                    idMobo,
+                    idHdd,
+                    idSsd,
+                    idRam,
+                    idFuente
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [idGabinete, idGPU, idProcesador, idMobo, idHdd, idSsd, idRam, idFuente]
+            );
+        }
+
+        res.status(201).json({ status: 'ok', message: 'Compra registrada' });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al registrar la compra', detalle: err.message });
     }
 });
 
