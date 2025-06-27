@@ -10,7 +10,12 @@
     <!-- NAVBAR -->
     <nav class="navbar-mipc">
         <span class="navbar-title">MiPC Express</span>
-        <button id="logout-btn">Cerrar sesión</button>
+        <div>
+            
+            <a href="/"><button class="btn" style="margin-right:10px;">Iniciar sesión</button></a>
+            <a href="/register"><button class="btn">Registrarse</button></a>
+            <button id="logout-btn" style="margin-right:10px;">Cerrar sesión</button>
+        </div>
     </nav>
     <main>
         <!-- Contenedor de componentes (izquierda) -->
@@ -22,56 +27,52 @@
                 <p>Procesador:</p>
                 <select id="procesador-combo"></select>
                 <button class="detalle-btn" data-tipo="procesador" data-combo="procesador-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="procesador" data-combo="procesador-combo">Agregar Producto</button>
+                
             </div>
             
             <div class="component-group">
                 <p>GPU:</p>
                 <select id="gpu-combo"></select>
                 <button class="detalle-btn" data-tipo="gpu" data-combo="gpu-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="gpu" data-combo="gpu-combo">Agregar Producto</button>
+                
             </div>
             
             <div class="component-group">
                 <p>RAM:</p>
                 <select id="ram-combo"></select>
                 <button class="detalle-btn" data-tipo="ram" data-combo="ram-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="ram" data-combo="ram-combo">Agregar Producto</button>
+                
             </div>
             
             <div class="component-group">
                 <p>Placa Madre:</p>
                 <select id="mobo-combo"></select>
                 <button class="detalle-btn" data-tipo="mobo" data-combo="mobo-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="mobo" data-combo="mobo-combo">Agregar Producto</button>
+                
             </div>
             
             <div class="component-group">
                 <p>Disco Duro:</p>
                 <select id="hdd-combo"></select>
                 <button class="detalle-btn" data-tipo="hdd" data-combo="hdd-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="hdd" data-combo="hdd-combo">Agregar Producto</button>
             </div>
             
             <div class="component-group">
                 <p>SSD:</p>
                 <select id="ssd-combo"></select>
                 <button class="detalle-btn" data-tipo="ssd" data-combo="ssd-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="ssd" data-combo="ssd-combo">Agregar Producto</button>
             </div>
             
             <div class="component-group">
                 <p>Fuente:</p>
                 <select id="fuente-combo"></select>
                 <button class="detalle-btn" data-tipo="fuente" data-combo="fuente-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="fuente" data-combo="fuente-combo">Agregar Producto</button>
             </div>
             
             <div class="component-group">
                 <p>Gabinete:</p>
                 <select id="gabinete-combo"></select>
                 <button class="detalle-btn" data-tipo="gabinete" data-combo="gabinete-combo">Ver detalles</button>
-                <button class="agregar-btn" data-tipo="gabinete" data-combo="gabinete-combo">Agregar Producto</button>
             </div>
         </div>
         

@@ -1,6 +1,7 @@
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
 import pool from "../db.js";
+import userSingleton from '../userSingleton.js';
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ async function revisarCookie(req) {
 
 async function middleware(req, res, next) {
     const usuario = await revisarCookie(req);
+    if (usuario) {
+        userSingleton.setUser(usuario); // Actualiza el usuario global
+    }
     if (!usuario) return next(); // No logueado, permite ver login/register
 
     // Evitar bucle de redirección: si ya está en la ruta correcta, continuar

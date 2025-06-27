@@ -1,4 +1,5 @@
 import pool from '../db.js';
+import userSingleton from '../userSingleton.js';
 
 //Esta funciin carga los productos de la base de datos y los devuelve en formato JSON
 // para que puedan ser utilizados en la aplicacin web. Se ejecutan todas las consultas en paralelo
@@ -31,6 +32,8 @@ async function carga_productos(req, res) {
         res.status(500).json({ error: 'Error al obtener componentes' });
     }
 }
+
+console.log("Usuario autenticado global:", userSingleton.getUser());
 
 export const methods = {
     carga_productos

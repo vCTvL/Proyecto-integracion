@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs';
 import jsonwebtoken from 'jsonwebtoken';
 import dotenv from "dotenv";
 import pool from '../db.js';
+import userSingleton from '../userSingleton.js';
 
 dotenv.config();
 
@@ -25,6 +26,9 @@ async function login(req, res) {
         if (!loginCorrecto) {
             return res.status(400).send({ status: "Error", message: "Contraseña incorrecta" });
         }
+
+        // Guardar usuario autenticado en el singleton
+        userSingleton.setUser(usuario.user);
 
         const token = jsonwebtoken.sign(
             { user: usuario.user },

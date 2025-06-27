@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Insertar el botón al final del contenedor de detalles
     contenedorDetalles.appendChild(btnComprar);
 
-    // --- NUEVO: Control de habilitación del botón comprar ---
+    
     // IDs de los combos requeridos
     const comboIds = [
         'procesador-combo',
@@ -406,11 +406,17 @@ document.getElementById('btn-mi-pc').addEventListener('click', async () => {
                     } else if (tipoSugerido === 'hdd' && detalles.hdd) {
                         compatibles = lista.filter(h => h.capacidad > (detalles.hdd.capacidad || 0));
                     }
-                    // Si no hay compatibles, muestra todos menos el actual
+                    // Si no hay compatibles, muestra al menos 1 producto distinto al actual
                     if (compatibles.length === 0) {
                         compatibles = lista.filter(x => x.id !== detalles[tipoSugerido]?.id);
+                        if (compatibles.length === 0 && lista.length > 0) {
+                            compatibles = [lista[0]]; // Si solo hay uno, mostrarlo igual
+                        } else if (compatibles.length === 0) {
+                            compatibles = lista; // fallback: muestra lo que haya
+                        }
                     }
-                    sugerencias = compatibles.slice(0, 3).map(item => ({
+                    // Mostrar al menos 1 sugerencia
+                    sugerencias = compatibles.slice(0, 1).map(item => ({
                         tipo: tipoSugerido,
                         item
                     }));

@@ -71,7 +71,7 @@ const camposPorTipo = {
         { name: 'nombre', label: 'Nombre', type: 'text', required: true },
         { name: 'marca', label: 'Marca', type: 'text', required: true },
         { name: 'nucleos', label: 'Núcleos', type: 'number', required: true },
-        { name: 'frecuencia_base', label: 'Frecuencia Base (GHz)', type: 'number', step: '0.1', required: true },
+        { name: 'frecuencia_base', label: 'Frecuencia Base (MHz)', type: 'number', step: '1', required: true }, 
         { name: 'socket', label: 'Socket', type: 'text', required: true },
         { name: 'precio', label: 'Precio', type: 'number', required: true }
     ],
@@ -166,18 +166,44 @@ formAgregar.addEventListener('submit', async (e) => {
     const tipo = tipoSelect.value;
     const datos = {};
     let camposVacios = [];
+    let errorValidacion = false;
+    let primerError = null;
     Array.from(formAgregar.elements).forEach(el => {
         if (el.name) {
-            // Convierte a número si es type number
-            if (el.type === 'number') {
-                if (el.value === '' || el.value === null || typeof el.value === 'undefined') {
-                    camposVacios.push(el.name);
-                } else {
-                    datos[el.name] = Number(el.value);
-                }
+            // Validación de campos vacíos
+            if (el.value === '' || el.value === null || typeof el.value === 'undefined') {
+                camposVacios.push(el.name);
+                el.style.borderColor = '#dc2626';
+                if (!primerError) primerError = el;
             } else {
-                if (el.value === '' || el.value === null || typeof el.value === 'undefined') {
-                    camposVacios.push(el.name);
+                el.style.borderColor = '';
+                // Validación de tipo number: no negativos
+                if (el.type === 'number') {
+                    // No negativos
+                    if (Number(el.value) < 0) {
+                        errorValidacion = true;
+                        el.style.borderColor = '#dc2626';
+                        if (!primerError) primerError = el;
+                    }
+                    // Validación especial para nucleos
+                    if (el.name === 'nucleos') {
+                        // Solo números enteros positivos y <= 30
+                        if (!/^\d+$/.test(el.value) || Number(el.value) > 30) {
+                            errorValidacion = true;
+                            el.style.borderColor = '#dc2626';
+                            if (!primerError) primerError = el;
+                        }
+                    }
+                    // Validación especial para frecuencia_base
+                    if (el.name === 'frecuencia_base') {
+                        // Solo números enteros positivos y <= 5000
+                        if (!/^\d+$/.test(el.value) || Number(el.value) > 5000) {
+                            errorValidacion = true;
+                            el.style.borderColor = '#dc2626';
+                            if (!primerError) primerError = el;
+                        }
+                    }
+                    datos[el.name] = Number(el.value);
                 } else {
                     datos[el.name] = el.value;
                 }
@@ -187,6 +213,13 @@ formAgregar.addEventListener('submit', async (e) => {
     if (camposVacios.length > 0) {
         msgAgregar.textContent = 'Por favor completa todos los campos antes de agregar el producto.';
         msgAgregar.style.color = '#dc2626';
+        if (primerError) primerError.focus();
+        return;
+    }
+    if (errorValidacion) {
+        msgAgregar.textContent = 'Error al ingresar los datos. Verifica campos validos.';
+        msgAgregar.style.color = '#dc2626';
+        if (primerError) primerError.focus();
         return;
     }
     try {
@@ -431,9 +464,45 @@ editarProductoBtn.addEventListener('click', async (e) => {
     const id = productoEditarSelect.value;
     if (!tipo || !id) return;
     const datos = {};
+    let errorValidacion = false;
+    let primerError = null;
     Array.from(formEditar.elements).forEach(el => {
-        if (el.name) datos[el.name] = el.value;
+        if (el.name) {
+            if (el.type === 'number') {
+                // No negativos
+                if (Number(el.value) < 0) {
+                    errorValidacion = true;
+                    el.style.borderColor = '#dc2626';
+                    if (!primerError) primerError = el;
+                }
+                // Validación especial para nucleos
+                if (el.name === 'nucleos') {
+                    if (!/^\d+$/.test(el.value) || Number(el.value) > 30) {
+                        errorValidacion = true;
+                        el.style.borderColor = '#dc2626';
+                        if (!primerError) primerError = el;
+                    }
+                }
+                // Validación especial para frecuencia_base
+                if (el.name === 'frecuencia_base') {
+                    if (!/^\d+$/.test(el.value) || Number(el.value) > 5000) {
+                        errorValidacion = true;
+                        el.style.borderColor = '#dc2626';
+                        if (!primerError) primerError = el;
+                    }
+                }
+                datos[el.name] = Number(el.value);
+            } else {
+                datos[el.name] = el.value;
+            }
+        }
     });
+    if (errorValidacion) {
+        msgEditar.textContent = 'Verifica que los campos numéricos sean positivos. Núcleos máximo 30, Frecuencia máxima 5000 MHz, y ambos solo números.';
+        msgEditar.style.color = '#dc2626';
+        if (primerError) primerError.focus();
+        return;
+    }
     try {
         const res = await fetch(`/api/admin/${tipo}/${id}`, {
             method: 'PUT',

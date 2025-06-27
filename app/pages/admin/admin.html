@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área de Administración</title>
-    <link rel="stylesheet" href="../style-public.css">
+    <link rel="stylesheet" href="/style-admin.css">
 </head>
 <body>
     <!-- NAVBAR -->
     <nav class="navbar-mipc">
         <span class="navbar-title">MiPC Express</span>
-        <button id="logout-btn">Cerrar sesión</button>
+        <div>
+            
+            <a href="/"><button class="btn" style="margin-right:10px;">Iniciar sesión</button></a>
+            <a href="/register"><button class="btn">Registrarse</button></a>
+            <button id="logout-btn" style="margin-right:10px;">Cerrar sesión</button>
+            
+        </div>
     </nav>
     <main>
         <div class="component-container">
@@ -18,7 +24,7 @@
             <p>Panel de control administrativo</p>
 
             <!-- Navegación de CRUD por tabla -->
-            <div style="margin-bottom:20px;">
+            <div class="crud-btns" style="margin-bottom:20px;">
                 <button class="detalle-btn" type="button" id="btn-agregar-producto">Agregar producto</button>
                 <button class="detalle-btn" type="button" id="btn-editar-producto">Editar producto</button>
                 <button class="detalle-btn" type="button" id="btn-eliminar-producto">Eliminar producto</button>

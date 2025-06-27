@@ -10,6 +10,7 @@ import { methods as metodo } from "./controllers/carga_productos.js"
 import { methods as detalleComponente } from "./controllers/detalle-componentes.js";
 import pool from './db.js';
 import jwt from 'jsonwebtoken';
+import userSingleton from './userSingleton.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 
@@ -40,11 +41,12 @@ app.get("/register", authorization.middleware, (req, res) => {
 
 app.get("/admin", authorization.middleware, (req, res) => {
     res.sendFile(__dirname + "/pages/admin/admin.html")
+    console.log("Usuario autenticado global:", userSingleton.getUser());
 })
 
 app.get('/public', authorization.middleware, async (req, res) => {
     res.sendFile(path.join(__dirname + "/pages/public.html"));
-
+    console.log("Usuario autenticado global:", userSingleton.getUser());
 });
 
 app.post("/api/register", authentication.register)
